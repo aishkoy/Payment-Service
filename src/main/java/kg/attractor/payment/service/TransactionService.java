@@ -7,7 +7,7 @@ import kg.attractor.payment.dto.TransactionRequestDto;
 import java.util.List;
 
 public interface TransactionService {
-    List<TransactionDto> getAccountTransactions(Long accountId);
+    List<TransactionDto> getAccountTransactions(Long accountId, Long userId);
 
     List<TransactionDto> getAllTransactions();
 

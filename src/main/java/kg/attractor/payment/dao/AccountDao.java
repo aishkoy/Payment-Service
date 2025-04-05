@@ -47,9 +47,9 @@ public class AccountDao {
         return Objects.requireNonNull(jdbcTemplate.queryForObject(sql, Long.class, accountId));
     }
 
-    public Integer updateBalance(Long accountId, BigDecimal amount) {
+    public void updateBalance(Long accountId, BigDecimal amount) {
         String sql = "UPDATE accounts SET balance = ? WHERE id = ?";
-        return jdbcTemplate.update(sql, amount, accountId);
+        jdbcTemplate.update(sql, amount, accountId);
     }
 
     public Integer countUserAccounts(Long userId) {

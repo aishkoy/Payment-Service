@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import kg.attractor.payment.dto.AccountDto;
 import kg.attractor.payment.dto.CurrencyDto;
 import kg.attractor.payment.service.AccountService;
+import kg.attractor.payment.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.List;
 public class AccountController {
 
     private final AccountService accountService;
+    private final UserService userService;
 
     @GetMapping
     public ResponseEntity<List<AccountDto>> getAccounts() {
@@ -30,11 +32,11 @@ public class AccountController {
 
     @GetMapping("balance")
     public ResponseEntity<BigDecimal> getBalance(@RequestParam Long accountId){
-        return ResponseEntity.ofNullable(accountService.getAccountBalance(accountId));
+        return ResponseEntity.ofNullable(accountService.getAuthAccountBalance(accountId, userService.getAuthId()));
     }
 
     @PostMapping("balance")
     public ResponseEntity<BigDecimal> topUp(@RequestParam Long accountId, @RequestParam BigDecimal amount){
-        return ResponseEntity.ofNullable(accountService.updateBalance(accountId, amount));
+        return ResponseEntity.ofNullable(accountService.topUpBalance(accountId, userService.getAuthId() ,amount));
     }
 }

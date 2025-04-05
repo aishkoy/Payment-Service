@@ -50,15 +50,9 @@ public class UserDao {
 
     public Optional<User> getUserById(Long id) {
         String sql = """
-                select * from users where id = ? and 
+                select * from users where id = ? and
                                           role_id = (select id from roles where role like 'USER')""";
         User user = DataAccessUtils.singleResult(jdbcTemplate.query(sql, new UserDaoMapper(), id));
-        return Optional.ofNullable(user);
-    }
-
-    public Optional<User> getUserByName(String name) {
-        String sql = "select * from users where name = ?";
-        User user = DataAccessUtils.singleResult(jdbcTemplate.query(sql, new UserDaoMapper(), name));
         return Optional.ofNullable(user);
     }
 

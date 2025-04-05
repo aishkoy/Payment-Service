@@ -12,9 +12,13 @@ public interface AccountService {
 
     Long createAccount(@Valid CurrencyDto dto);
 
+    BigDecimal getAuthAccountBalance(Long accountId, Long userId);
+
     BigDecimal getAccountBalance(Long accountId);
 
     BigDecimal updateBalance(Long accountId, BigDecimal amount);
+
+    BigDecimal topUpBalance(Long accountId, Long userId, BigDecimal amount);
 
     AccountDto getAccountByUserAndId(Long userId, Long accountId);
 

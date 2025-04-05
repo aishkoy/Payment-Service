@@ -33,7 +33,7 @@ VALUES ('John Doe', '996 (666) 66-66-66', 'john.doe@example.com', '$2a$12$CR.NIg
         (SELECT id FROM roles WHERE role = 'USER'), true),
        ('John Doe', '996 (555) 55-55-55', 'jane.smith@example.com', '$2a$12$CR.NIg7ZFIknaqY6.fwUou.pkQWejZqL7tk7uzJEIJSoR6OHlp/da',
         (SELECT id FROM roles WHERE role = 'USER'), true),
-       ('12345', '996 (999) 99-99-99', 'qwe@qwe.qwe', '$2a$12$qwlWOaWric/SiLrf9QAYuOsV1oD1zQ0BDW6JhOe3.okXuvfudKFra',
+       ('12345', '996 (999) 99-99-99', '12345', '$2a$12$qwlWOaWric/SiLrf9QAYuOsV1oD1zQ0BDW6JhOe3.okXuvfudKFra',
         (SELECT id FROM roles WHERE role = 'ADMIN'), true);
 -- passwords: qwerty
 

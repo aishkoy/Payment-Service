@@ -50,7 +50,7 @@ public class TransactionDao {
 
     public Optional<Transaction> getRequiringApprovalTransaction(Long transactionId) {
         String sql = """
-                select * from transactions where id = ? 
+                select * from transactions where id = ?
                                              and STATUS_ID =
                                                  (select id from transaction_statuses where status like 'PENDING')""";
         Transaction transaction = DataAccessUtils.singleResult(jdbcTemplate.query(sql, new TransactionDaoMapper(), transactionId));
@@ -65,14 +65,14 @@ public class TransactionDao {
     public List<Transaction> getTransactionsRequiringApproval(){
         String sql = """
                 select * from TRANSACTIONS
-                where STATUS_ID = 
-                      (select status_id from TRANSACTION_STATUSES 
+                where STATUS_ID =
+                      (select id from TRANSACTION_STATUSES
                                         WHERE STATUS like 'PENDING')
                 """;
         return jdbcTemplate.query(sql, new TransactionDaoMapper());
     }
 
-    public Long updateTransaction(Transaction transaction) {
+    public void updateTransaction(Transaction transaction) {
         String sql = """
                 update transactions
                 set status_id = ?, updated_at = now()
@@ -86,17 +86,18 @@ public class TransactionDao {
             ps.setLong(2, transaction.getId());
             return ps;
         }, keyHolder);
-
-        return Objects.requireNonNull(keyHolder.getKey()).longValue();
     }
 
     public Optional<Transaction> getTransactionForCancellation(Long transactionId) {
         String sql = """
-                select * from transactions
-                where id = ? and STATUS_ID = (select id from TRANSACTION_STATUSES
-                    where STATUS like 'COMPLETED' or STATUS like 'PENDING')
-                """;
-        Transaction transaction = DataAccessUtils.singleResult(jdbcTemplate.query(sql, new TransactionDaoMapper(), transactionId));
+            SELECT * FROM transactions t
+            JOIN transaction_statuses ts ON t.status_id = ts.id
+            WHERE t.id = ? AND (ts.status = 'COMPLETED' OR ts.status = 'PENDING')
+            """;
+        Transaction transaction = DataAccessUtils.singleResult(
+                jdbcTemplate.query(sql, new TransactionDaoMapper(), transactionId)
+        );
+
         return Optional.ofNullable(transaction);
     }
 }

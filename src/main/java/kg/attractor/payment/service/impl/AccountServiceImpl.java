@@ -1,6 +1,5 @@
 package kg.attractor.payment.service.impl;
 
-import kg.attractor.payment.component.AuthAdapter;
 import kg.attractor.payment.dao.AccountDao;
 import kg.attractor.payment.dto.AccountDto;
 import kg.attractor.payment.dto.CurrencyDto;
@@ -12,6 +11,7 @@ import kg.attractor.payment.mapper.AccountMapper;
 import kg.attractor.payment.model.Account;
 import kg.attractor.payment.service.AccountService;
 import kg.attractor.payment.service.CurrencyService;
+import kg.attractor.payment.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -27,11 +27,11 @@ public class AccountServiceImpl implements AccountService {
     private final AccountDao dao;
     private final AccountMapper accountMapper;
     private final CurrencyService currencyService;
-    private final AuthAdapter adapter;
+    private final UserService userService;
 
     @Override
     public List<AccountDto> getUserAccounts() {
-        Long userId = adapter.getAuthId();
+        Long userId = userService.getAuthId();
         List<AccountDto> accounts = dao.getUserAccounts(userId)
                 .stream()
                 .map(accountMapper::toDto)
@@ -45,19 +45,23 @@ public class AccountServiceImpl implements AccountService {
         log.info("Creating account {}", dto);
 
         Long currencyId = currencyService.getCurrencyIdByName(dto.getCurrency());
-        Long userId = adapter.getAuthId();
+        Long userId = userService.getAuthId();
         validateAccount(userId, currencyId);
 
-        Long accountId =  dao.create(userId, currencyId);
+        Long accountId = dao.create(userId, currencyId);
         log.info("Account {} created with id {}", accountId, accountId);
         return accountId;
     }
 
     @Override
-    public BigDecimal getAccountBalance(Long accountId) {
-        Long userId = adapter.getAuthId();
+    public BigDecimal getAuthAccountBalance(Long accountId, Long userId) {
+        getAccountByUserAndId(userId, accountId);
+        return getAccountBalance(accountId);
+    }
 
-        AccountDto accountDto = getAccountByUserAndId(userId, accountId);
+    @Override
+    public BigDecimal getAccountBalance(Long accountId) {
+        AccountDto accountDto = getAccountById(accountId);
         BigDecimal balance = accountDto.getBalance();
 
         log.info("Account {} balance {}", accountId, balance);
@@ -66,21 +70,24 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public BigDecimal updateBalance(Long accountId, BigDecimal amount) {
-        Long userId = adapter.getAuthId();
-        AccountDto before = getAccountByUserAndId(userId, accountId);
-        log.info("Balance before {}", before.getBalance());
-
-        dao.updateBalance(accountId, before.getBalance().add(amount));
-
+        dao.updateBalance(accountId, amount);
         BigDecimal balance = getAccountBalance(accountId);
         log.info("Balance after {}", balance);
         return balance;
     }
 
     @Override
-    public AccountDto getAccountByUserAndId(Long userId, Long accountId){
+    public BigDecimal topUpBalance(Long accountId, Long userId, BigDecimal amount) {
+        getAccountByUserAndId(userId, accountId);
+        BigDecimal balance = amount.add(getAccountBalance(accountId));
+        dao.updateBalance(accountId, balance);
+        return balance;
+    }
+
+    @Override
+    public AccountDto getAccountByUserAndId(Long userId, Long accountId) {
         Account account = dao.getAccountByUserAndId(userId, accountId)
-                .orElseThrow(() -> new AccountNotFoundException("Ypu have no account with id " +  accountId));
+                .orElseThrow(() -> new AccountNotFoundException("Ypu have no account with id " + accountId));
         return accountMapper.toDto(account);
     }
 
@@ -93,10 +100,10 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Long getAccountCurrencyId(Long id){
-        try{
+    public Long getAccountCurrencyId(Long id) {
+        try {
             return dao.getAccountCurrencyId(id);
-        } catch(EmptyResultDataAccessException e){
+        } catch (EmptyResultDataAccessException e) {
             throw new CurrencyNotFoundException("Your account has no currency");
         }
     }

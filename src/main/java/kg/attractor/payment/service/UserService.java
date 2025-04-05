@@ -9,5 +9,5 @@ public interface UserService {
 
     UserDto blockUser(Long id);
 
-    UserDto getUserByName(String name);
+    Long getAuthId();
 }

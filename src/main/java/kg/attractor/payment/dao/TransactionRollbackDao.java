@@ -10,7 +10,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 
 import java.sql.PreparedStatement;
-import java.util.Objects;
 import java.util.Optional;
 
 @Component
@@ -18,7 +17,7 @@ import java.util.Optional;
 public class TransactionRollbackDao {
     private final JdbcTemplate jdbcTemplate;
 
-    public Long addTransaction(Long transactionId) {
+    public void addTransaction(Long transactionId) {
         String sql = """
                     insert into TRANSACTION_ROLLBACKS (transaction_id, created_at)
                     values (?, now())
@@ -30,8 +29,6 @@ public class TransactionRollbackDao {
             ps.setLong(1, transactionId);
             return ps;
         }, keyHolder);
-
-        return Objects.requireNonNull(keyHolder.getKey()).longValue();
     }
 
     public Optional<Transaction> getTransactionForDeleting(Long transactionId) {

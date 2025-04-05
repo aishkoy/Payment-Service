@@ -9,9 +9,12 @@ import kg.attractor.payment.model.User;
 import kg.attractor.payment.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
+
+import java.util.NoSuchElementException;
 
 @Slf4j
 @Service
@@ -51,14 +54,6 @@ public class UserServiceImpl implements UserService {
         return getUserById(id);
     }
 
-    @Override
-    public UserDto getUserByName(String name){
-        User user = dao.getUserByName(name)
-                .orElseThrow(() -> new UserNotFoundException("User with name " + name + " not found"));
-        log.info("Retrieved user by name : {}", user.getName());
-        return userMapper.toDto(user);
-    }
-
     public UserDto getUserById(Long id){
         User user = dao.getUserById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found"));
@@ -71,5 +66,21 @@ public class UserServiceImpl implements UserService {
         if(Boolean.TRUE.equals(isEmailValid)) {
             throw new UserAlreadyExistsException("User with email " + email + " already exists");
         }
+    }
+
+    public UserDto getAuthUser(){
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        UserDto user = getUserByEmail(username);
+
+        if (user == null) {
+            throw new NoSuchElementException("User not found");
+        }
+
+        return user;
+    }
+
+    @Override
+    public Long getAuthId(){
+        return getAuthUser().getId();
     }
 }

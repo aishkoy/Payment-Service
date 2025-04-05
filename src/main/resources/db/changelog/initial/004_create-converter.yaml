@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: 004 create currency converter table
+      author: Aisha
+      changes:
+        - createTable:
+            tableName: currency_converter
+            columns:
+              - column:
+                  name: from_currency_id
+                  type: long
+                  constraints:
+                    nullable: false
+              - column:
+                  name: to_currency_id
+                  type: long
+                  constraints:
+                    nullable: false
+              - column:
+                  name: rate
+                  type: decimal(10,2)
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: currency_converter
+            baseColumnNames: from_currency_id
+            referencedTableName: currencies
+            referencedColumnNames: id
+            constraintName: fk_from_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: currency_converter
+            baseColumnNames: to_currency_id
+            referencedTableName: currencies
+            referencedColumnNames: id
+            constraintName: fk_to_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE

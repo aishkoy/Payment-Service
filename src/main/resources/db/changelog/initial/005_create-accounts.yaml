@@ -1,0 +1,51 @@
+databaseChangeLog:
+  - changeSet:
+      id: 005 create account table
+      author: Aisha
+      changes:
+        - createTable:
+            tableName: accounts
+            columns:
+              - column:
+                  name: id
+                  type: long
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: user_id
+                  type: long
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: currency_id
+                  type: long
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: balance
+                  type: decimal(10,2)
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: accounts
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_user_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE
+
+        - addForeignKeyConstraint:
+            baseTableName: accounts
+            baseColumnNames: currency_id
+            referencedTableName: currencies
+            referencedColumnNames: id
+            constraintName: fk_currency_id
+            onDelete: RESTRICT
+            onUpdate: CASCADE

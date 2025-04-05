@@ -7,12 +7,14 @@ import kg.attractor.payment.dto.CurrencyDto;
 import kg.attractor.payment.exception.AccountAlreadyExistsException;
 import kg.attractor.payment.exception.AccountLimitExceededException;
 import kg.attractor.payment.exception.AccountNotFoundException;
+import kg.attractor.payment.exception.CurrencyNotFoundException;
 import kg.attractor.payment.mapper.AccountMapper;
 import kg.attractor.payment.model.Account;
 import kg.attractor.payment.service.AccountService;
 import kg.attractor.payment.service.CurrencyService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -42,7 +44,7 @@ public class AccountServiceImpl implements AccountService {
     public Long createAccount(CurrencyDto dto) {
         log.info("Creating account {}", dto);
 
-        Long currencyId = currencyService.getCurrecyIdByName(dto.getCurrency());
+        Long currencyId = currencyService.getCurrencyIdByName(dto.getCurrency());
         Long userId = adapter.getAuthId();
         validateAccount(userId, currencyId);
 
@@ -75,6 +77,30 @@ public class AccountServiceImpl implements AccountService {
         return balance;
     }
 
+    @Override
+    public AccountDto getAccountByUserAndId(Long userId, Long accountId){
+        Account account = dao.getAccountByUserAndId(userId, accountId)
+                .orElseThrow(() -> new AccountNotFoundException("Ypu have no account with id " +  accountId));
+        return accountMapper.toDto(account);
+    }
+
+    @Override
+    public AccountDto getAccountById(Long id) {
+        Account account = dao.getAccountById(id)
+                .orElseThrow(() -> new AccountNotFoundException("Account with id " + id + " not found"));
+        log.info("Retrieved account {}", account);
+        return accountMapper.toDto(account);
+    }
+
+    @Override
+    public Long getAccountCurrencyId(Long id){
+        try{
+            return dao.getAccountCurrencyId(id);
+        } catch(EmptyResultDataAccessException e){
+            throw new CurrencyNotFoundException("Your account has no currency");
+        }
+    }
+
     private void validateAccount(Long userId, Long currencyId) {
         if (dao.countUserAccounts(userId) > 3) {
             throw new AccountLimitExceededException("You cannot create more than 3 accounts!");
@@ -93,18 +119,5 @@ public class AccountServiceImpl implements AccountService {
         log.info("Retrieved {} accounts", accounts.size());
     }
 
-    @Override
-    public AccountDto getAccountByUserAndId(Long userId, Long accountId){
-        Account account = dao.getAccountByUserAndId(userId, accountId)
-                .orElseThrow(() -> new AccountNotFoundException("Ypu have no account with id " +  accountId));
-        return accountMapper.toDto(account);
-    }
 
-    @Override
-    public AccountDto getAccountById(Long id) {
-        Account account = dao.getAccountById(id)
-                .orElseThrow(() -> new AccountNotFoundException("Account with id " + id + " not found"));
-        log.info("Retrieved account {}", account);
-        return accountMapper.toDto(account);
-    }
 }

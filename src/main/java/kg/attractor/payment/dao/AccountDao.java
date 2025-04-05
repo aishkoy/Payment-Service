@@ -21,7 +21,7 @@ public class AccountDao {
     private final JdbcTemplate jdbcTemplate;
 
     public List<Account> getUserAccounts(Long userId) {
-        String sql = "select * from account where user_id=?";
+        String sql = "select * from accounts where user_id=?";
         return jdbcTemplate.query(sql, new AccountDaoMapper(), userId);
     }
 
@@ -42,13 +42,18 @@ public class AccountDao {
         return Objects.requireNonNull(keyHolder.getKey()).longValue();
     }
 
+    public Long getAccountCurrencyId(Long accountId) {
+        String sql = "select currency_id from accounts where id = ?";
+        return Objects.requireNonNull(jdbcTemplate.queryForObject(sql, Long.class, accountId));
+    }
+
     public Integer updateBalance(Long accountId, BigDecimal amount) {
         String sql = "UPDATE accounts SET balance = ? WHERE id = ?";
         return jdbcTemplate.update(sql, amount, accountId);
     }
 
     public Integer countUserAccounts(Long userId) {
-        String sql = "select count(*) from users where user_id=?";
+        String sql = "select count(*) from ACCOUNTS where USER_ID=?";
         return Objects.requireNonNull(jdbcTemplate.queryForObject(sql, Integer.class, userId));
     }
 

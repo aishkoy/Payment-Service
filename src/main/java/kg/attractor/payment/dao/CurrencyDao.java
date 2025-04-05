@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 @Component
 @RequiredArgsConstructor
 public class CurrencyDao {
@@ -11,6 +13,6 @@ public class CurrencyDao {
 
     public Long getCurrencyIdByName(String name) {
         String sql = "SELECT id FROM currencies WHERE currency = ?";
-        return jdbcTemplate.queryForObject(sql, Long.class, name);
+        return Objects.requireNonNull(jdbcTemplate.queryForObject(sql, Long.class, name));
     }
 }

@@ -19,4 +19,6 @@ public interface AccountService {
     AccountDto getAccountByUserAndId(Long userId, Long accountId);
 
     AccountDto getAccountById(Long accountId);
+
+    Long getAccountCurrencyId(Long id);
 }

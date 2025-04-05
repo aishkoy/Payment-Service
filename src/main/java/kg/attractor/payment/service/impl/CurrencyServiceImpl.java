@@ -13,11 +13,11 @@ public class CurrencyServiceImpl implements CurrencyService {
     private final CurrencyDao dao;
 
     @Override
-    public Long getCurrecyIdByName(String name){
+    public Long getCurrencyIdByName(String name){
         try {
             return dao.getCurrencyIdByName(name.toUpperCase());
         } catch (EmptyResultDataAccessException e) {
-            throw new CurrencyNotFoundException("Не существует такой категории!");
+            throw new CurrencyNotFoundException("Currency with name " + name + " not found");
         }
     }
 }

@@ -27,6 +27,7 @@ databaseChangeLog:
                   name: email
                   type: varchar(100)
                   constraints:
+                    unique: true
                     nullable: false
               - column:
                   name: password

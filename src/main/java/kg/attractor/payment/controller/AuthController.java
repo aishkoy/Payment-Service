@@ -2,6 +2,8 @@ package kg.attractor.payment.controller;
 
 
 import jakarta.validation.Valid;
+import kg.attractor.payment.dto.UserDto;
+import kg.attractor.payment.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api")
 @RequiredArgsConstructor
+
 public class AuthController {
     private final UserService userService;
 

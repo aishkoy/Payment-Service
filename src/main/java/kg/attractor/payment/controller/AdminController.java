@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("api/admin")
@@ -34,8 +33,7 @@ public class AdminController {
     }
 
     @PostMapping("transactions/rollback")
-    public ResponseEntity<TransactionDto> rollbackTransaction(@RequestBody Map<String, Long> transaction){
-        Long transactionId  = transaction.get("transactionId");
+    public ResponseEntity<TransactionDto> rollbackTransaction(@RequestParam Long transactionId){
         return ResponseEntity.ofNullable(transactionService.rollbackTransaction(transactionId));
     }
 

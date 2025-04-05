@@ -99,14 +99,4 @@ public class TransactionDao {
         Transaction transaction = DataAccessUtils.singleResult(jdbcTemplate.query(sql, new TransactionDaoMapper(), transactionId));
         return Optional.ofNullable(transaction);
     }
-
-    public Optional<Transaction> getTransactionForDeleting(Long transactionId) {
-        String sql = """
-                select * from TRANSACTIONS
-                where ID = ? and STATUS_ID = (select id from TRANSACTION_STATUSES
-                    where STATUS like 'ROLLED_BACK')""";
-        Transaction transaction = DataAccessUtils.singleResult(jdbcTemplate.query(sql, new TransactionDaoMapper(), transactionId));
-        return Optional.ofNullable(transaction);
-    }
-
 }

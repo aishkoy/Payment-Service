@@ -3,6 +3,7 @@ package kg.attractor.payment.service.impl;
 import jakarta.validation.Valid;
 import kg.attractor.payment.component.AuthAdapter;
 import kg.attractor.payment.dao.TransactionDao;
+import kg.attractor.payment.dao.TransactionRollbackDao;
 import kg.attractor.payment.dto.TransactionDto;
 import kg.attractor.payment.dto.TransactionRequestDto;
 import kg.attractor.payment.exception.InsufficientFundsException;
@@ -25,6 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class TransactionServiceImpl implements TransactionService {
     private final TransactionDao dao;
+    private final TransactionRollbackDao rollbackDao;
     private final TransactionMapper transactionMapper;
     private final AuthAdapter adapter;
     private final AccountService accountService;
@@ -137,13 +139,14 @@ public class TransactionServiceImpl implements TransactionService {
     public TransactionDto deleteTransaction(Long transactionId) {
         TransactionDto dto = getTransactionForDeleting(transactionId);
         dto.setStatusId(statusService.getStatusCompleted());
+        rollbackDao.addTransaction(transactionId);
         dao.updateTransaction(transactionMapper.toEntity(dto));
         log.info("Deleted transaction {}", transactionId);
         return dto;
     }
 
     public TransactionDto getTransactionForDeleting(Long transactionId) {
-        Transaction transaction = dao.getTransactionForDeleting(transactionId)
+        Transaction transaction = rollbackDao.getTransactionForDeleting(transactionId)
                 .orElseThrow(() -> new TransactionNotFoundException("Transaction with id " + transactionId + " cannot be deleted."));
         log.info("Retrieved transaction for deleting {}", transactionId);
         return transactionMapper.toDto(transaction);

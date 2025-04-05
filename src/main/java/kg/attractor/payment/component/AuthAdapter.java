@@ -18,14 +18,22 @@ public class AuthAdapter {
 
     public UserDto getAuthUser(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
         if (authentication == null) {
             throw new NoSuchElementException("user not authorized");
         }
         if (authentication instanceof AnonymousAuthenticationToken){
             throw new IllegalArgumentException("user not authorized");
         }
-        String email = authentication.getName();
-        return service.getUserByEmail(email);
+
+        String username = authentication.getName();
+        UserDto user = service.getUserByEmail(username);
+
+        if (user == null) {
+            throw new NoSuchElementException("User not found");
+        }
+
+        return user;
     }
 
     public Long getAuthId(){

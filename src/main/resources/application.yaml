@@ -39,3 +39,5 @@ logging:
       max-file-size: 10MB
       max-history: 7
 
+server:
+  port: 8888

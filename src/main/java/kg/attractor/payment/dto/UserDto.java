@@ -18,10 +18,10 @@ public class UserDto {
     Long id;
 
     @NotNull
-    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ]+$",
+    @Pattern(regexp = "^[a-zA-Zа-яА-ЯёЁ0-9]+$",
             message = """
-                    Имя должно содержать только русские
-                    и английские буквы без пробелов""")
+                Имя может содержать только русские
+                и английские буквы и цифры без пробелов""")
     String name;
 
     @NotNull

@@ -56,6 +56,12 @@ public class UserDao {
         return Optional.ofNullable(user);
     }
 
+    public Optional<User> getUserByName(String name) {
+        String sql = "select * from users where name = ?";
+        User user = DataAccessUtils.singleResult(jdbcTemplate.query(sql, new UserDaoMapper(), name));
+        return Optional.ofNullable(user);
+    }
+
     public void blockUser(Long userId) {
         String sql = "update users set enabled = false where id = ?";
         jdbcTemplate.update(sql, userId);

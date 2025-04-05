@@ -8,4 +8,6 @@ public interface UserService {
     UserDto getUserByEmail(String email);
 
     UserDto blockUser(Long id);
+
+    UserDto getUserByName(String name);
 }

@@ -52,6 +52,14 @@ public class UserServiceImpl implements UserService {
         return getUserById(id);
     }
 
+    @Override
+    public UserDto getUserByName(String name){
+        User user = dao.getUserByName(name)
+                .orElseThrow(() -> new UserNotFoundException("User with name " + name + " not found"));
+        log.info("Retrieved user by name : {}", user.getName());
+        return userMapper.toDto(user);
+    }
+
     public UserDto getUserById(Long id){
         User user = dao.getUserById(id)
                 .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found"));
@@ -61,7 +69,7 @@ public class UserServiceImpl implements UserService {
 
     private void validateUser(String email) {
         Boolean isEmailValid = dao.existsUserByEmail(email);
-        if(Boolean.FALSE.equals(isEmailValid)) {
+        if(Boolean.TRUE.equals(isEmailValid)) {
             throw new UserAlreadyExistsException("User with email " + email + " already exists");
         }
     }

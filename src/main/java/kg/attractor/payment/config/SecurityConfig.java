@@ -42,11 +42,6 @@ public class SecurityConfig {
                 .dataSource(dataSource)
                 .usersByUsernameQuery(fetchUser)
                 .authoritiesByUsernameQuery(fetchRole);
-
-        auth.jdbcAuthentication()
-                .dataSource(dataSource)
-                .usersByUsernameQuery(fetchUser)
-                .authoritiesByUsernameQuery(fetchRole);
     }
 
     @Bean

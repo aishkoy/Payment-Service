@@ -4,7 +4,6 @@ import jakarta.validation.Valid;
 import kg.attractor.payment.dto.TransactionDto;
 import kg.attractor.payment.dto.TransactionRequestDto;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public interface TransactionService {

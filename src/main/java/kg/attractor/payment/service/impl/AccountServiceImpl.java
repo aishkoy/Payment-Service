@@ -34,7 +34,7 @@ public class AccountServiceImpl implements AccountService {
                 .stream()
                 .map(accountMapper::toDto)
                 .toList();
-        validateAccountList(accounts, "User has no accounts");
+        validateAccountList(accounts);
         return accounts;
     }
 
@@ -63,12 +63,12 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public BigDecimal topUpAccount(Long accountId, BigDecimal amount) {
+    public BigDecimal updateBalance(Long accountId, BigDecimal amount) {
         Long userId = adapter.getAuthId();
         AccountDto before = getAccountByUserAndId(userId, accountId);
         log.info("Balance before {}", before.getBalance());
 
-        dao.topUpAccount(accountId, amount);
+        dao.updateBalance(accountId, before.getBalance().add(amount));
 
         BigDecimal balance = getAccountBalance(accountId);
         log.info("Balance after {}", balance);
@@ -85,17 +85,26 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
-    private void validateAccountList(List<?> accounts, String errorMessage) {
+    private void validateAccountList(List<?> accounts) {
         if (accounts.isEmpty()) {
-            log.warn(errorMessage);
-            throw new AccountNotFoundException(errorMessage);
+            log.warn("User has no accounts");
+            throw new AccountNotFoundException("You have no accounts");
         }
         log.info("Retrieved {} accounts", accounts.size());
     }
 
+    @Override
     public AccountDto getAccountByUserAndId(Long userId, Long accountId){
         Account account = dao.getAccountByUserAndId(userId, accountId)
                 .orElseThrow(() -> new AccountNotFoundException("Ypu have no account with id " +  accountId));
+        return accountMapper.toDto(account);
+    }
+
+    @Override
+    public AccountDto getAccountById(Long id) {
+        Account account = dao.getAccountById(id)
+                .orElseThrow(() -> new AccountNotFoundException("Account with id " + id + " not found"));
+        log.info("Retrieved account {}", account);
         return accountMapper.toDto(account);
     }
 }

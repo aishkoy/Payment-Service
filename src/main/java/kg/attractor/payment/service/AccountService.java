@@ -14,5 +14,9 @@ public interface AccountService {
 
     BigDecimal getAccountBalance(Long accountId);
 
-    BigDecimal topUpAccount(Long accountId, BigDecimal amount);
+    BigDecimal updateBalance(Long accountId, BigDecimal amount);
+
+    AccountDto getAccountByUserAndId(Long userId, Long accountId);
+
+    AccountDto getAccountById(Long accountId);
 }

@@ -42,8 +42,8 @@ public class AccountDao {
         return Objects.requireNonNull(keyHolder.getKey()).longValue();
     }
 
-    public Integer topUpAccount(Long accountId, BigDecimal amount) {
-        String sql = "UPDATE accounts SET balance = balance + ? WHERE id = ?";
+    public Integer updateBalance(Long accountId, BigDecimal amount) {
+        String sql = "UPDATE accounts SET balance = ? WHERE id = ?";
         return jdbcTemplate.update(sql, amount, accountId);
     }
 
@@ -55,6 +55,12 @@ public class AccountDao {
     public Optional<Account> getAccountByUserAndId(Long userId, Long accountId) {
         String sql = "select * from accounts where user_id=? and id=?";
         Account account = DataAccessUtils.singleResult(jdbcTemplate.query(sql, new AccountDaoMapper(), userId, accountId));
+        return Optional.ofNullable(account);
+    }
+
+    public Optional<Account> getAccountById(Long accountId) {
+        String sql = "select * from accounts where id=?";
+        Account account = DataAccessUtils.singleResult(jdbcTemplate.query(sql, new AccountDaoMapper(), accountId));
         return Optional.ofNullable(account);
     }
 

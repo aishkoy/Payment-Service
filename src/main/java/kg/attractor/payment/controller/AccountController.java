@@ -35,6 +35,6 @@ public class AccountController {
 
     @PostMapping("balance")
     public ResponseEntity<BigDecimal> topUp(@RequestParam Long accountId, @RequestParam BigDecimal amount){
-        return ResponseEntity.ofNullable(accountService.topUpAccount(accountId, amount));
+        return ResponseEntity.ofNullable(accountService.updateBalance(accountId, amount));
     }
 }

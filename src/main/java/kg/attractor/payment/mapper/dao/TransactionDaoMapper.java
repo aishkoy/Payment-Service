@@ -17,6 +17,6 @@ public class TransactionDaoMapper implements RowMapper<Transaction> {
         transaction.setStatusId(rs.getLong("status_id"));
         transaction.setCreatedAt(rs.getTimestamp("created_at"));
         transaction.setUpdatedAt(rs.getTimestamp("updated_at"));
-        return null;
+        return transaction;
     }
 }

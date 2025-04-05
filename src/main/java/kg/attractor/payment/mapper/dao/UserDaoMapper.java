@@ -17,6 +17,6 @@ public class UserDaoMapper implements RowMapper<User> {
         user.setPassword(rs.getString("password"));
         user.setRoleId(rs.getLong("role_id"));
         user.setEnabled(rs.getBoolean("enabled"));
-        return null;
+        return user;
     }
 }

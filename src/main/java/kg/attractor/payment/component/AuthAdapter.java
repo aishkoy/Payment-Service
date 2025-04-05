@@ -13,7 +13,6 @@ import java.util.NoSuchElementException;
 @Component
 @RequiredArgsConstructor
 public class AuthAdapter {
-
     private final UserService service;
 
     public UserDto getAuthUser(){

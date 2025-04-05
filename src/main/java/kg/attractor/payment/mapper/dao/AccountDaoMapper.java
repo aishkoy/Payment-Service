@@ -14,6 +14,6 @@ public class AccountDaoMapper implements RowMapper<Account> {
         account.setUserId(rs.getLong("user_id"));
         account.setCurrencyId(rs.getLong("currency_id"));
         account.setBalance(rs.getBigDecimal("balance"));
-        return null;
+        return account;
     }
 }

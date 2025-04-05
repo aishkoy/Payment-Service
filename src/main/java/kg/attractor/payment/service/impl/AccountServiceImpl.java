@@ -102,7 +102,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     private void validateAccount(Long userId, Long currencyId) {
-        if (dao.countUserAccounts(userId) > 3) {
+        if (dao.countUserAccounts(userId) >= 3) {
             throw new AccountLimitExceededException("You cannot create more than 3 accounts!");
         }
 

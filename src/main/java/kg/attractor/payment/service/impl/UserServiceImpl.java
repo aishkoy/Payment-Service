@@ -37,10 +37,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto getUserByEmail(String email) {
-        String userEmail = email.trim().toLowerCase();
-        User user = dao.getUserByEmail(userEmail).
-                orElseThrow(() -> new UserNotFoundException("User with email " + email + " not found"));
-        log.info("Retrieved user by email : {}", userEmail);
+        User user = dao.getUserByEmail(email)
+                        .orElseThrow(() -> new UserNotFoundException("User with email " + email + " not found"));
+        log.info("Retrieved user by email : {}", email);
         return userMapper.toDto(user);
     }
 

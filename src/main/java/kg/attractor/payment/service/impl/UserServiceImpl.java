@@ -3,7 +3,9 @@ package kg.attractor.payment.service.impl;
 import kg.attractor.payment.dao.UserDao;
 import kg.attractor.payment.dto.UserDto;
 import kg.attractor.payment.exception.UserAlreadyExistsException;
+import kg.attractor.payment.exception.UserNotFoundException;
 import kg.attractor.payment.mapper.UserMapper;
+import kg.attractor.payment.model.User;
 import kg.attractor.payment.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +33,15 @@ public class UserServiceImpl implements UserService {
         userDto.setName(name);
 
         return dao.register(userMapper.toEntity(userDto));
+    }
+
+    @Override
+    public UserDto getUserByEmail(String email) {
+        String userEmail = email.trim().toLowerCase();
+        User user = dao.getUserByEmail(userEmail).
+                orElseThrow(() -> new UserNotFoundException("User with email " + email + " not found"));
+        log.info("Retrieved user by email : {}", userEmail);
+        return userMapper.toDto(user);
     }
 
     private void validateUser(String email) {

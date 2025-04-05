@@ -9,7 +9,16 @@ import java.util.List;
 
 public interface TransactionService {
     List<TransactionDto> getAccountTransactions(Long accountId);
+
+    List<TransactionDto> getAllTransactions();
+
+    List<TransactionDto> getTransactionsRequiringApproval();
+
     Long processTransaction(@Valid TransactionRequestDto transactionDto);
 
-    Long processTransaction(Long fromAccountId, Long toAccountId, BigDecimal amount);
+    TransactionDto approveTransaction(Long transactionId);
+
+    TransactionDto rollbackTransaction(Long transactionId);
+
+    TransactionDto deleteTransaction(Long transactionId);
 }

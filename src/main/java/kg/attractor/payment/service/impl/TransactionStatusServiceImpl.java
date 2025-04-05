@@ -26,18 +26,13 @@ public class TransactionStatusServiceImpl implements TransactionStatusService {
     }
 
     @Override
-    public Long getStatusApproved() {
-        return getStatusIdByName("APPROVED");
-    }
-
-    @Override
     public Long getStatusDeleted() {
         return getStatusIdByName("DELETED");
     }
 
     @Override
-    public Long getStatusRollback() {
-        return getStatusIdByName("ROLLBACK");
+    public Long getStatusRolledBack() {
+        return getStatusIdByName("ROLLED_BACK");
     }
 
     @Override

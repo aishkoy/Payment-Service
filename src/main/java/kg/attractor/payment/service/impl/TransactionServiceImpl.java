@@ -46,6 +46,26 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
+    public List<TransactionDto> getAllTransactions(){
+        List<TransactionDto> transactions = dao.getAllTransactions()
+                .stream()
+                .map(transactionMapper::toDto)
+                .toList();
+        validateTransactionList(transactions);
+        return transactions;
+    }
+
+    @Override
+    public List<TransactionDto> getTransactionsRequiringApproval() {
+        List<TransactionDto> transactions = dao.getTransactionsRequiringApproval()
+                .stream()
+                .map(transactionMapper::toDto)
+                .toList();
+        validateTransactionList(transactions);
+        return transactions;
+    }
+
+    @Override
     public Long processTransaction(@Valid TransactionRequestDto transactionDto) {
         Long fromAccount = transactionDto.getFromAccountId();
         Long toAccount = transactionDto.getToAccountId();
@@ -63,14 +83,12 @@ public class TransactionServiceImpl implements TransactionService {
         if (amount.compareTo(BigDecimal.TEN) > 0) {
             return createTransactionWithPending(fromAccount, toAccount, amount);
         } else {
-            return processTransaction(fromAccount, toAccount, amount);
+            Long transactionStatus = statusService.getStatusCompleted();
+            return processTransaction(fromAccount, toAccount, amount, transactionStatus);
         }
     }
 
-    @Override
-    public Long processTransaction(Long fromAccountId, Long toAccountId, BigDecimal amount) {
-        Long transactionStatus = statusService.getStatusCompleted();
-
+    public Long processTransaction(Long fromAccountId, Long toAccountId, BigDecimal amount, Long transactionStatus) {
         BigDecimal fromAccountBalance = accountService.getAccountBalance(fromAccountId).subtract(amount);
         BigDecimal toAccountBalance = convertCurrencyIfNecessary(fromAccountId, toAccountId, amount);
 
@@ -87,6 +105,62 @@ public class TransactionServiceImpl implements TransactionService {
         );
         log.info("Transaction {} created with status 'completed'.", transactionId);
         return transactionId;
+    }
+
+    public void processTransaction(TransactionDto dto) {
+        processTransaction(dto.getFromAccountId(), dto.getToAccountId(), dto.getAmount(),dto.getStatusId());
+    }
+
+    @Override
+    public TransactionDto approveTransaction(Long transactionId) {
+        TransactionDto dto = getRequiringApprovalTransaction(transactionId);
+        dto.setStatusId(statusService.getStatusCompleted());
+        processTransaction(dto);
+        return dto;
+    }
+
+    @Override
+    public TransactionDto rollbackTransaction(Long transactionId) {
+        TransactionDto dto = getTransactionByIdForRollback(transactionId);
+
+        if(dto.getStatusId().equals(statusService.getStatusCompleted())) {
+            processTransaction(dto.getToAccountId(), dto.getFromAccountId(), dto.getAmount(), statusService.getStatusRolledBack());
+        }
+
+        dto.setStatusId(statusService.getStatusRolledBack());
+        dao.updateTransaction(transactionMapper.toEntity(dto));
+        log.info("Rolled back transaction {}", transactionId);
+        return null;
+    }
+
+    @Override
+    public TransactionDto deleteTransaction(Long transactionId) {
+        TransactionDto dto = getTransactionForDeleting(transactionId);
+        dto.setStatusId(statusService.getStatusCompleted());
+        dao.updateTransaction(transactionMapper.toEntity(dto));
+        log.info("Deleted transaction {}", transactionId);
+        return dto;
+    }
+
+    public TransactionDto getTransactionForDeleting(Long transactionId) {
+        Transaction transaction = dao.getTransactionForDeleting(transactionId)
+                .orElseThrow(() -> new TransactionNotFoundException("Transaction with id " + transactionId + " cannot be deleted."));
+        log.info("Retrieved transaction for deleting {}", transactionId);
+        return transactionMapper.toDto(transaction);
+    }
+
+    public TransactionDto getTransactionByIdForRollback(Long transactionId) {
+        Transaction transaction = dao.getTransactionForCancellation(transactionId)
+                .orElseThrow(() -> new TransactionNotFoundException("Transaction with id " + transactionId + " cannot be rolled back"));
+        log.info("Retrieved transaction with id {}", transactionId);
+        return transactionMapper.toDto(transaction);
+    }
+
+    public TransactionDto getRequiringApprovalTransaction(Long transactionId) {
+        Transaction transaction = dao.getRequiringApprovalTransaction(transactionId)
+                .orElseThrow(() -> new TransactionNotFoundException("Transaction with id " + transactionId + " doesn't needs approval"));
+        log.info("Transaction {} approved with id {}", transactionId, transactionId);
+        return transactionMapper.toDto(transaction);
     }
 
     private Long createTransactionWithPending(Long fromAccount, Long toAccount, BigDecimal amount) {

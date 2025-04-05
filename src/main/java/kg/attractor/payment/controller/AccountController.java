@@ -1,9 +1,15 @@
 package kg.attractor.payment.controller;
 
 import jakarta.validation.Valid;
+import kg.attractor.payment.dto.AccountDto;
+import kg.attractor.payment.dto.CurrencyDto;
+import kg.attractor.payment.service.AccountService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.util.List;
 
 @RestController
 @RequestMapping("api/accounts")
@@ -18,17 +24,17 @@ public class AccountController {
     }
 
     @PostMapping
-    public ResponseEntity<Long> createAccount(@RequestBody @Valid  CurrencyDto dto){
+    public ResponseEntity<Long> createAccount(@RequestBody @Valid CurrencyDto dto){
         return ResponseEntity.ofNullable(accountService.createAccount(dto));
     }
 
     @GetMapping("balance")
-    public ResponseEntity<Double> getBalance(@RequestParam Long accountId){
+    public ResponseEntity<BigDecimal> getBalance(@RequestParam Long accountId){
         return ResponseEntity.ofNullable(accountService.getAccountBalance(accountId));
     }
 
     @PostMapping("balance")
-    public ResponseEntity<AccountDto> topUp(@RequestBody @Valid AccountDto dto){
-        return ResponseEntity.ofNullable(accountService.topUpAccount(dto));
+    public ResponseEntity<BigDecimal> topUp(@RequestParam Long accountId, @RequestParam BigDecimal amount){
+        return ResponseEntity.ofNullable(accountService.topUpAccount(accountId, amount));
     }
 }

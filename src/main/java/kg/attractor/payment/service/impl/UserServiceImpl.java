@@ -44,6 +44,21 @@ public class UserServiceImpl implements UserService {
         return userMapper.toDto(user);
     }
 
+    @Override
+    public UserDto blockUser(Long id){
+        getUserById(id);
+        dao.blockUser(id);
+        log.info("Blocked user: {}", id);
+        return getUserById(id);
+    }
+
+    public UserDto getUserById(Long id){
+        User user = dao.getUserById(id)
+                .orElseThrow(() -> new UserNotFoundException("User with id " + id + " not found"));
+        log.info("Retrieved user by id : {}", user.getId());
+        return userMapper.toDto(user);
+    }
+
     private void validateUser(String email) {
         Boolean isEmailValid = dao.existsUserByEmail(email);
         if(Boolean.FALSE.equals(isEmailValid)) {

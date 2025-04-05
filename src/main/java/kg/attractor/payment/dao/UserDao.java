@@ -48,4 +48,16 @@ public class UserDao {
         return Optional.ofNullable(user);
     }
 
+    public Optional<User> getUserById(Long id) {
+        String sql = """
+                select * from users where id = ? and 
+                                          role_id = (select id from roles where role like 'USER')""";
+        User user = DataAccessUtils.singleResult(jdbcTemplate.query(sql, new UserDaoMapper(), id));
+        return Optional.ofNullable(user);
+    }
+
+    public void blockUser(Long userId) {
+        String sql = "update users set enabled = false where id = ?";
+        jdbcTemplate.update(sql, userId);
+    }
 }

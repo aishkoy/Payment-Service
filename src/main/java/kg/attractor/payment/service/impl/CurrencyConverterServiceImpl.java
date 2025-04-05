@@ -24,4 +24,10 @@ public class CurrencyConverterServiceImpl implements CurrencyConverterService {
             throw new CurrencyRateNotFoundException("Currency rate not found");
         }
     }
+
+    @Override
+    public BigDecimal convert(Long fromCurrency, Long toCurrency, BigDecimal amount){
+        BigDecimal rate = getRate(fromCurrency, toCurrency);
+        return amount.multiply(rate);
+    }
 }
